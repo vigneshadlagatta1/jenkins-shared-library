@@ -9,7 +9,7 @@ def call(Map config) {
 
         stages {
 
-            // ✅ SET ENV (FIX FOR SHARED LIB)
+            // ✅ INIT ENV (FIXED)
             stage('Init') {
                 steps {
                     script {
@@ -29,7 +29,7 @@ def call(Map config) {
                 }
             }
 
-            // ✅ PARALLEL STAGES
+            // ✅ PARALLEL EXECUTION
             stage('Build & Test Parallel') {
                 parallel {
 
@@ -67,8 +67,8 @@ def call(Map config) {
                         withCredentials([string(credentialsId: 'sonar-token', variable: 'TOKEN')]) {
                             sh """
                             mvn sonar:sonar \
-                            -Dsonar.projectKey=${APP_NAME} \
-                            -Dsonar.projectVersion=${VERSION} \
+                            -Dsonar.projectKey=${env.APP_NAME} \
+                            -Dsonar.projectVersion=${env.VERSION} \
                             -Dsonar.login=\$TOKEN
                             """
                         }
@@ -76,7 +76,7 @@ def call(Map config) {
                 }
             }
 
-            // ✅ QUALITY GATE
+            // ✅ QUALITY GATE (SAFE MODE)
             stage('Quality Gate') {
                 steps {
                     timeout(time: 3, unit: 'MINUTES') {
